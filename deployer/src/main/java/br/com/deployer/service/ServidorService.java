@@ -1,0 +1,118 @@
+package br.com.deployer.service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.context.FacesContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import br.com.deployer.exception.ValidationException;
+import br.com.deployer.model.Servidor;
+import br.com.deployer.model.Usuario;
+import br.com.deployer.repository.ServidorRepository;
+import br.com.deployer.util.ValidatorUrl;
+
+@Service
+public class ServidorService {
+
+	@Autowired
+	private ServidorRepository repository;
+
+	@Autowired
+	private ServletContainerService servletContainerService;
+
+	@Transactional
+	public Servidor salvar(Servidor servidor) {
+		validar(servidor);
+		Usuario usuarioSessao = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+				.get("usuarioSessao");
+		servidor.setDataCadastro(LocalDateTime.now());
+		servidor.setUsuarioCadastro(usuarioSessao);
+		repository.save(servidor);
+		servletContainerService.salvarLista(servidor.getServletContainers());
+		return servidor;
+	}
+
+	@Transactional
+	public Servidor atualizar(Servidor servidor) {
+		validar(servidor);
+		Usuario usuarioSessao = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+				.get("usuarioSessao");
+		servidor.setDataCadastro(LocalDateTime.now());
+		servidor.setUsuarioCadastro(usuarioSessao);
+		repository.save(servidor);
+		servletContainerService.salvarLista(servidor.getServletContainers());
+		servletContainerService.deletar(servidor.getServletContainersDeletar());
+		return servidor;
+	}
+
+	private void validar(Servidor servidor) {
+
+		List<String> checks = new ArrayList<String>();
+
+		if (servidor.getNome() == null || servidor.getNome().trim().equals("")) {
+			checks.add("O preenchimento do campo Nome é obrigatório");
+		}
+
+//		if (servidor.getLabel() == null || servidor.getLabel().trim().equals("")) {
+//			checks.add("O preenchimento do campo Label é obrigatório");
+//		}
+
+		if (servidor.getUrl() == null || servidor.getUrl().trim().equals("")) {
+			checks.add("O preenchimento do campo Url é obrigatório");
+		}
+
+		boolean isValida = ValidatorUrl.isValida(servidor.getUrl());
+		
+		if(!isValida) {
+			checks.add("Formato de url inválido.");
+		}
+
+		if (servidor.getServletContainers() == null || servidor.getServletContainers().isEmpty()) {
+			checks.add("É necessário adicionar pelo menos 1 servlet");
+		}
+
+		Servidor servidorAuxiliar = repository.findByNome(servidor.getNome());
+
+		if (servidorAuxiliar != null && !servidorAuxiliar.getId().equals(servidor.getId())) {
+			checks.add("Nome já está sendo utilizado. Digite outro.");
+		}
+
+		// servidorAuxiliar = repository.findByLabel(servidor.getLabel());
+
+//		if (servidorAuxiliar != null && !servidorAuxiliar.getId().equals(servidor.getId())) {
+//			checks.add("Label já está sendo utilizado. Digite outro.");
+//		}
+
+		servidorAuxiliar = repository.findByUrl(servidor.getUrl());
+
+		if (servidorAuxiliar != null && !servidorAuxiliar.getId().equals(servidor.getId())) {
+			checks.add("Url já está sendo utilizado. Digite outro.");
+		}
+
+		if (!checks.isEmpty()) {
+			throw new ValidationException(checks);
+		}
+	}
+
+	public List<Servidor> pesquisarServidor(Servidor filtro) {
+		return repository.findByNomeAndLabel("%" + filtro.getNome() + "%", "%" + filtro.getLabel() + "%");
+	}
+
+	public Servidor buscaPorId(Long id) {
+		return this.repository.findById(id).orElse(null);
+	}
+
+	@Transactional
+	public void excluir(Servidor servidor) {
+		this.repository.delete(servidor);
+	}
+
+	public List<Servidor> listarServidores() {
+		return repository.findAll();
+	}
+}

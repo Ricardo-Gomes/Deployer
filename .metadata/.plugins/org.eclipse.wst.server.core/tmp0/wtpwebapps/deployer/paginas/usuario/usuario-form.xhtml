@@ -1,0 +1,104 @@
+<ui:composition template="/template/layout-padrao.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+	<ui:define name="conteudo">
+
+		<div class="box box-default">
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					<i class="fa fa-pencil-square-o" aria-hidden="true"></i> 
+					Formulário de Usuários
+				</h3>
+			</div>
+
+			<f:metadata>
+				<f:viewParam name="id" value="#{usuarioForm.idEdicao}" />
+				<f:viewAction action="#{usuarioForm.inicializa()}" />
+			</f:metadata>
+
+			<div class="box-body">
+				<h:form id="usuario-form">
+
+					<div class="row">
+						<div class="col-md-4">
+							<div class="form-group" jsf:rendered="#{usuarioForm.usuario.id != null}" >
+								<h:outputLabel value="Id" />
+								<h:inputText id="inputId" 
+											 value="#{usuarioForm.usuario.id}"
+											 styleClass="form-control" 
+											 disabled="true"/>
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="form-group" jsf:rendered="#{usuarioForm.usuario.dataCadastro != null}">
+								<h:outputLabel value="Data de Cadastro" />
+								<h:inputText id="inputData"
+											 value="#{usuarioForm.usuario.dataCadastro}"
+											 styleClass="form-control" 
+											 disabled="true">
+								</h:inputText>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="row">
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputLabel value="Nome" />
+								<h:inputText id="inputNome" 
+											 value="#{usuarioForm.usuario.nome}"
+											 styleClass="form-control" />
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputLabel value="Login*" />
+								<h:inputText id="inputLogin"
+											 value="#{usuarioForm.usuario.login}" 
+											 styleClass="form-control" />
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputLabel value="Senha" />
+								<h:inputSecret id="inputSenha"
+											   value="#{usuarioForm.usuario.senha}" 
+											   styleClass="form-control" 
+											    redisplay="true"/>
+							</div>
+						</div>
+					</div>
+					<hr />
+
+					<div class="row">
+						<div class="col-md-12">
+
+							<p:commandButton value="Salvar" 
+											 icon="fa fa-save"
+											 class="btn btn-primary"
+											 actionListener="#{usuarioForm.cadastro}" 
+											 update=":usuario-form :mensagem" />
+
+							<p:commandButton value="voltar" 
+											 icon="fa fa-reply"
+											 class="btn btn-danger"
+											 action="usuario-list?faces-redirect=true" 
+											 immediate="true" 
+											 style="margin:0 10px;"/>
+						</div>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

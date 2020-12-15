@@ -1,0 +1,34 @@
+package br.com.deployer.view.bean.converters;
+
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+
+import br.com.deployer.model.ServletContainer;
+
+@FacesConverter(forClass = ServletContainer.class)
+public class ServletContainerConverter implements Converter{
+
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String idString) {
+		if (idString == null) {
+			return null;
+		}
+		Long id = Long.valueOf(idString);
+		ServletContainer servletContainer = (ServletContainer) component.getAttributes().get(idString);
+		return servletContainer;
+	}
+
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		if (value == null) {
+			return null;
+		}
+		ServletContainer servletContainer = (ServletContainer) value;
+		String idString = servletContainer.getId().toString();
+		component.getAttributes().put(idString, servletContainer);
+		return idString;
+	}
+
+}

@@ -1,0 +1,144 @@
+<ui:composition template="/template/layout-padrao.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+	<ui:define name="conteudo">
+
+		<div class="box box-default">
+
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					<i class="fa fa-upload" aria-hidden="true"></i> Realizar Deploy
+				</h3>
+			</div>
+
+			<ui:param name="bean" value="#{deployBean}" />
+			<h:form enctype="multipart/form-data" prependId="false" id="frm">
+
+				<div class="box-body">
+					<div class="row">
+						
+						<div class="col-md-3">
+							<div class="form-group">
+								<label>Usuario* : </label>
+								<h:selectOneMenu id="usuarioCadastro" 
+												 styleClass="form-control"
+												 value="#{bean.entidade.usuarioCadastro}">
+									
+									<f:selectItems value="#{bean.usuarios}" 
+												   var="usuarioCadastro"
+												   itemLabel="#{usuarioCadastro.nome}"
+												   itemValue="#{usuarioCadastro}" />
+								</h:selectOneMenu>
+							</div>
+						</div>
+
+						<div class="col-md-3">
+							<div class="form-group">
+								<label>Servidor* : </label>
+								<h:selectOneMenu id="servidor" 
+												 styleClass="form-control"
+												 value="#{bean.entidade.servidor}">
+									
+									<f:selectItem itemLabel="--Selecione--" 
+												  itemValue="#{null}" />
+									
+									<f:selectItems value="#{bean.servidores}" 
+												   var="servidor"
+												   itemLabel="#{servidor.nome}" 
+												   itemValue="#{servidor}" />
+									
+									<p:ajax event="change" 
+											process="@this"
+											listener="#{bean.listarServletContainers}" 
+											update="servletContainer" />
+								</h:selectOneMenu>
+							</div>
+						</div>
+
+						<div class="col-md-3">
+							<div class="form-group">
+								<label for="tomcats">Servlet Container* : </label>
+								<h:selectOneMenu id="servletContainer" 
+												 styleClass="form-control"
+												 value="#{bean.entidade.servletContainer}">
+												 
+									<f:selectItem itemLabel="--Selecione--" 
+												  itemValue="#{null}" />
+									
+									<f:selectItems value="#{bean.servletContainersServidorSelecionado}"
+												   var="servletContainer" 
+												   itemLabel="#{servletContainer.nome}" 
+												   itemValue="#{servletContainer}" />
+								</h:selectOneMenu>
+							</div>
+						</div>
+
+
+						<div class="col-md-3">
+							<div class="form-group">
+								<label>Caminho do contexto*: </label>
+								<h:inputText id="inputCaminho"
+											 value="#{bean.entidade.caminhoContexto}" 
+											 class="form-control" />
+							</div>
+						</div>
+					</div>
+
+					<br />
+
+					<div class="row">
+						<div class="col-md-6">
+							<p:fileUpload process="@this" 
+										  skinSimple="true"
+										  label="Selecionar War" 
+										  auto="true"
+										  fileUploadListener="#{bean.fileUploadListener}" 
+										  update="nomeWar" />
+						</div>
+					</div>
+					<br />
+					<div class="row">
+						<h:panelGroup id="nomeWar">
+							<div class="col-md-3">
+								<div class="form-group">
+									<label>Arquivo Selecionado: </label>
+									<h:inputText value="#{bean.entidade.war.nomeArquivo}"
+												 disabled="true" 
+												 styleClass="form-control" />
+								</div>
+							</div>
+						</h:panelGroup>
+					</div>
+
+					<br />
+
+					<div class="row">
+						<div class="col-md-12">
+							
+							<p:dialog widgetVar="carregando" 
+								  	  modal="true" 
+								      draggable="false" 
+								      closable="false" 
+								      resizable="false" 
+								      showHeader="false">
+								  
+						<p:graphicImage value="/resources/images/loadingBall.gif" width="150" height="150"/>
+						</p:dialog>
+							<p:commandButton value="Enviar" 
+											 process="@this, @form"
+											 update="mensagem" 
+											 actionListener="#{bean.enviar}" 
+											 styleClass="btn btn-success"
+                                             onclick="PF('carregando').show()"
+											 oncomplete="PF('carregando').hide()" />
+						</div>
+					</div>
+				</div>
+			</h:form>
+		</div>
+	</ui:define>
+</ui:composition>

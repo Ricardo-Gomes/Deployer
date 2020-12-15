@@ -1,0 +1,4 @@
+INDEX VERSION 1.4+C:\Users\ricardo\Desktop\projetos-estudos\goploy\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+2708748553.index
+910477114.index
+4206876905.index

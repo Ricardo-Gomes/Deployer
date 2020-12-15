@@ -1,0 +1,233 @@
+<ui:composition template="/template/layout-padrao.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:jsf="http://xmlns.jcp.org/jsf"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+	<ui:define name="conteudo">
+
+		<div class="box box-default">
+
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					<i class="fa fa-pencil-square-o" aria-hidden="true"></i> 
+					Formulário de Servidores
+				</h3>
+			</div>
+
+			<f:metadata>
+				<f:viewParam name="id" value="#{servidorForm.idEdicao}" />
+				<f:viewAction action="#{servidorForm.inicializa()}" />
+			</f:metadata>
+
+			<div class="box-body">
+				<h:form id="frm">
+
+					<div class="row">
+						<div class="col-md-4">
+							<div class="form-group" jsf:rendered="#{servidorForm.servidor.id != null}">
+								<h:outputLabel value="Id" />
+								<h:inputText id="inputId" 
+											 value="#{servidorForm.servidor.id}"
+											 styleClass="form-control" 
+											 disabled="true" />
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="form-group" jsf:rendered="#{servidorForm.servidor.dataCadastro != null}">
+								<h:outputLabel value="Data de Cadastro" />
+								<h:inputText id="inputData"
+											 value="#{servidorForm.servidor.dataCadastro}"
+											 styleClass="form-control" 
+											 disabled="true">
+								</h:inputText>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputLabel value="Nome*" />
+								<h:inputText id="inputNome"
+											 value="#{servidorForm.servidor.nome}" 
+											 styleClass="form-control" />
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputLabel value="Label" />
+								<h:inputText id="inputLabel"
+											 value="#{servidorForm.servidor.label}"
+											 styleClass="form-control" />
+							</div>
+						</div>
+
+						<div class="col-md-4">
+							<div class="form-group">
+								<h:outputLabel value="Url*" />
+								<h:inputText id="inputUrl" 
+											 value="#{servidorForm.servidor.url}"
+											 styleClass="form-control" >
+									<f:ajax event="blur" 
+											execute="@this" 
+											render="inputUrl :mensagem" 
+											listener="#{servidorForm.validarUrl()}"/>
+								</h:inputText>
+							</div>
+						</div>
+					</div>
+
+					<hr />
+
+					<h5 class="box-title">
+						<i class="fa fa-archive" aria-hidden="true"></i> 
+						Servlet Container
+					</h5>
+
+					<div class="row">
+						<div class="col-md-12">
+
+							<p:commandButton value="Adicionar" 
+											 icon="fa fa-plus"
+											 onclick="PF('dlg2').show();return false"
+											 actionListener="#{servidorForm.novoServletContainer}" 
+											 ajax="true"
+											 update=":frm-servletContainer" 
+											 class="btn btn-default"/>
+						</div>
+					</div>
+					
+
+					<p:dataTable id="servletContainersTable" 
+								 emptyMessage="nenhum registro"
+								 value="#{servidorForm.listaServletContainers}" 
+								 var="servletContainer">
+				   
+						<p:column headerText="Nome">
+							<h:outputText value="#{servletContainer.nome}" />
+						</p:column>
+
+						<p:column headerText="label">
+							<h:outputText value="#{servletContainer.label}" />
+						</p:column>
+
+						<p:column headerText="Usuário">
+							<h:outputText value="#{servletContainer.usuario}" />
+						</p:column>
+
+						<p:column headerText="Senha">
+							<h:outputText value="#{servletContainer.senha}" />
+						</p:column>
+
+						<p:column>
+							<p:commandButton value="Remover" 
+											 icon="fa fa-trash"
+											 actionListener="#{servidorForm.removerServletContainer(servletContainer)}"
+											 update="servletContainersTable :mensagem">
+							</p:commandButton>
+						</p:column>
+
+					</p:dataTable>
+
+					<hr />
+					<div class="row">
+						<div class="col-md-12">
+							<p:commandButton value="Salvar" 
+											 icon="fa fa-save"
+											 rendered="#{servidorForm.servidor.id eq null}"
+											 action="#{servidorForm.salvar}" 
+											 update=":frm :mensagem" 
+											 class="btn btn-primary"/>
+
+							<p:commandButton value="Atualizar" 
+											 icon="fa fa-refresh"
+											 rendered="#{servidorForm.servidor.id ne null}"
+											 action="#{servidorForm.atualizar}" 
+											 class="btn btn-default"
+											 update=":frm :mensagem"/>
+
+							<p:commandButton value="Voltar" 
+											 icon="fa fa-reply"
+											 action="servidor-list.xhtml?faces-redirect=true" 
+											 imediate="true" 
+											 class="btn btn-danger"
+											 style="margin:0 10px;"/>
+						</div>
+					</div>
+				</h:form>
+
+				<p:dialog header="Servlet Container" 
+						  widgetVar="dlg2" 
+						  modal="true"
+						  closeOnEscape="true" 
+						  execute="@this" 
+						  resizable="true">
+
+					<div class="box-body">
+						<h:form id="frm-servletContainer">
+
+							<div class="row">
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<h:outputLabel value="Nome*" />
+										<h:inputText id="inputNomeServletContainer"
+													 value="#{servidorForm.servletContainer.nome}" 
+													 styleClass="form-control" />
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<h:outputLabel value="Label" />
+										<h:inputText id="inputLabelServletContainer"
+													 value="#{servidorForm.servletContainer.label}"
+													 styleClass="form-control" />
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<h:outputLabel value="Usuário*" />
+										<h:inputText id="inputUsuarioServletContainer"
+													 value="#{servidorForm.servletContainer.usuario}"
+													 styleClass="form-control" />
+									</div>
+								</div>
+
+								<div class="col-md-6">
+									<div class="form-group">
+										<h:outputLabel value="Senha*" />
+										<h:inputText id="inputSenhaServletContainer"
+													 value="#{servidorForm.servletContainer.senha}"
+													 styleClass="form-control" />
+									</div>
+								</div>
+							</div>
+
+							<div class="row">
+								<div class="col-md-12">
+									<p:commandButton value="Adicionar" 
+													 icon="fa fa-plus"
+													 process="@this, @form"
+													 actionListener="#{servidorForm.adicionarServletContainer}"
+													 update=":frm-servletContainer :frm:servletContainersTable"
+													 oncomplete="PF('dlg2').initPosition()">
+									</p:commandButton>
+								</div>
+							</div>
+						</h:form>
+
+					</div>
+				</p:dialog>
+			</div>
+		</div>
+
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+
+	<h:outputStylesheet library="fontawesome" name="css/font-awesome.css" />
+	<h:outputStylesheet library="ionicons" name="dist/css/ionicons.min.css" />
+	<h:outputStylesheet library="adminlte"
+		name="bootstrap/css/bootstrap.min.css" />
+	<h:outputStylesheet library="adminlte" name="css/AdminLTE.min.css" />
+	<h:outputStylesheet library="adminlte"
+		name="css/skins/_all-skins.min.css" />
+	<h:outputStylesheet library="adminlte"
+		name="plugins/iCheck/flat/blue.css" />
+
+	<h:outputStylesheet library="css" name="toastr.min.css" />
+	<h:outputStylesheet library="css" name="style.css" />
+	<h:outputStylesheet library="css" name="pace.css" />
+
+
+	<title>Deployer</title>
+</h:head>
+<h:body styleClass="hold-transition skin-blue sidebar-mini ">
+	<div class="wrapper">
+		<header class="main-header"> <a jsfc="h:outputLink"
+			value="#{request.contextPath}/home.xhtml" class="logo"> <span
+			class="logo-mini">DP</span> <span class="logo-lg"> <i
+				class="fa  fa-globe"></i><b> Deployer</b>
+		</span>
+		</a> <nav class="navbar navbar-static-top"> <a href="#"
+			class="sidebar-toggle" data-toggle="offcanvas"></a>
+		<div class="navbar-custom-menu">
+			<ul class="nav navbar-nav">
+				<li class="dropdown user user-menu"><a class="dropdown-toggle"
+					data-toggle="dropdown"></a></li>
+			</ul>
+		</div>
+		</nav> </header>
+		<div class="sidebar-wrapper">
+			<aside class="main-sidebar"> 
+			<section class="sidebar">
+			
+			<ul class="sidebar-menu">
+				<li>
+					<a jsfc="h:outputLink" value="#{request.contextPath}/home.xhtml"> 
+						<i class="fa fa-home"></i> 
+						<span> 
+							<h:outputText value="Início" />
+						</span>
+					</a>
+				</li>
+				<li>
+					
+					<a jsfc="h:outputLink" value="#{request.contextPath}/paginas/usuario/usuario-list.xhtml">
+						<i class="fa fa-users"></i> 
+							<span> 
+								<h:outputText value="Usuários" />
+							</span>
+					</a>
+				</li>
+				<li>
+					<a jsfc="h:outputLink" value="#{request.contextPath}/paginas/servidor/servidor-list.xhtml">
+						<i class="fa fa-server"></i> 
+							<span> 
+								<h:outputText value="Servidores" />
+							</span>
+					</a>
+				</li>
+				<li>
+					<a jsfc="h:outputLink" value="#{request.contextPath}/paginas/deploy/deploy.xhtml"> 
+						<i class="fa fa-upload"></i> 
+						<span> 
+							<h:outputText value="Deploy" />
+						</span>
+					</a>
+				</li>
+				<li>
+					<a jsfc="h:outputLink" value="#{request.contextPath}/paginas/aplicacao/aplicacao.xhtml">
+						<i class="fa fa-folder"></i> 
+						<span> 
+						<h:outputText value="Aplicações" />
+					</span>
+					</a>
+				</li>
+				
+				<li>
+					<a jsfc="h:outputLink" value="#{request.contextPath}/logout">
+						<i class="fa fa-sign-out"></i> 
+						<span> 
+						<h:outputText value="Logout" />
+					</span>
+					</a>
+				</li>
+			</ul>
+			</section> </aside>
+		</div>
+		
+		<h:form rendered="false">
+			<p:menubar>
+			
+				<p:menuitem value="Inicio" url="/index.xhtml" />
+				<p:menuitem value="Usuários"
+					url="/paginas/usuario/usuario-list.xhtml" />
+				<p:menuitem value="Servidores"
+					url="/paginas/servidor/servidor-list.xhtml" />
+				<p:menuitem value="Deploy" url="/paginas/deploy/deploy.xhtml" />
+				<p:menuitem value="Aplicações"
+					url="/paginas/aplicacao/aplicacao.xhtml" />
+			</p:menubar>
+		</h:form>
+
+		<div class="content-wrapper">
+				<p:messages id="mensagem" showDetail="false" />
+			<ui:insert name="conteudo" />
+		</div>
+
+		<ui:include src="loader.xhtml" />
+	</div>
+
+<!-- 	<h:outputScript library="js" name="jquery-2.2.3.min.js" /> -->
+	<h:outputScript library="adminlte" name="bootstrap/js/bootstrap.min.js" />
+	<h:outputScript library="adminlte"
+		name="plugins/jQueryUI/jquery-ui.min.js" />
+	<h:outputScript library="adminlte"
+		name="plugins/fastclick/fastclick.min.js" />
+	<h:outputScript library="adminlte"
+		name="plugins/slimScroll/jquery.slimscroll.min.js" />
+	<h:outputScript library="adminlte" name="js/app.min.js" />
+	<h:outputScript library="js" name="pace.min.js" />
+
+
+	<h:outputScript library="js" name="toastr.min.js" />
+	<h:outputScript library="js" name="scripts.js" />
+</h:body>
+</html>

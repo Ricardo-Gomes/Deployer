@@ -1,0 +1,108 @@
+package br.com.digitoglobal.goploy.service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.faces.context.FacesContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
+
+import br.com.deployer.exception.ValidationException;
+import br.com.deployer.model.Usuario;
+import br.com.deployer.repository.UsuarioRepository;
+
+public class UsuarioService implements UserDetailsService{
+
+	@Autowired
+	private UsuarioRepository repository;
+	
+	@Autowired
+	private PasswordEncoder encoder;
+
+	@Transactional
+	public Usuario salvar(Usuario usuario) {
+		validar(usuario);
+		Usuario usuarioSessao = (Usuario) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("usuarioSessao");
+		usuario.setDataCadastro(LocalDateTime.now());
+		usuario.setUsuarioCadastro(usuarioSessao);
+		usuario.criptografarSenha(encoder);
+		return repository.save(usuario);
+	}
+
+	private void validar(Usuario usuario) {
+		List<String> checks = new ArrayList<String>();
+
+		if (usuario.getLogin() == null || usuario.getLogin().trim().equals("")) {
+			checks.add("O preenchimento do campo Login é obrigatório.");
+		}
+
+		if (usuario.getNome() == null || usuario.getNome().trim().equals("")) {
+			checks.add("O preenchimento do campo Nome é obrigatório.");
+		}
+
+		if (usuario.getSenha() == null || usuario.getSenha().trim().equals("")) {
+			checks.add("O preenchimento do campo Senha é obrigatório.");
+		}
+
+		Usuario usuarioAuxiliar = verificarLoginExistente(usuario);
+
+		if (usuarioAuxiliar != null && !usuarioAuxiliar.getId().equals(usuario.getId())) {
+			checks.add("Login já está sendo utilizado. Digite outro.");
+		}
+
+		if (!checks.isEmpty()) {
+			throw new ValidationException(checks);
+		}
+	}
+
+	public Usuario verificarLoginExistente(Usuario filtro) {
+		return repository.findByLogin(filtro.getLogin());
+	}
+
+	public List<Usuario> pesquisarUsuarios(Usuario filtro) {
+		return repository.findByNomeAndLogin("%" + filtro.getNome() + "%", "%" + filtro.getLogin() + "%");
+	}
+
+	public Usuario buscarPorId(Long id) {
+		return this.repository.findById(id).orElse(null);
+	}
+
+	@Transactional
+	public void excluir(Usuario usuario) {
+		this.repository.delete(usuario);
+	}
+
+	public List<Usuario> listarUsuarios() {
+		return repository.findAll();
+	}
+	
+	public Usuario autenticarLoginUsuario(Usuario usuario) {
+		Usuario usuarioVerificado = repository.
+				findByAutenticarLoginUsuario(usuario.getLogin(), usuario.getSenha());
+		return usuarioVerificado;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+		Usuario usuario = repository.findByLogin(login);
+		return Optional.ofNullable(usuario)
+				.map(u -> User.builder().username(usuario.getLogin()).password(usuario.getSenha()).roles("USER").build())
+				.orElseThrow(() -> new UsernameNotFoundException("Login inválido.") )
+				;
+	}
+	
+	public static void main(String[] args) {
+		PasswordEncoder encoder = new BCryptPasswordEncoder();
+		String senha = encoder.encode("123");
+		System.out.println(senha);
+	}
+}

@@ -1,0 +1,112 @@
+package br.com.deployer.config;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.zaxxer.hikari.HikariDataSource;
+
+@Configuration
+@ComponentScan(basePackages = "br.com.deployer.*")
+@EnableJpaRepositories(
+		basePackages = "br.com.deployer.repository", 
+		entityManagerFactoryRef = "entityManagerFactory", 
+		transactionManagerRef = "transactionManager"
+)
+@EnableTransactionManagement(proxyTargetClass = true)
+@PropertySource("classpath:project.properties")
+public class SpringConfiguration {
+	
+	@Value("${dataSource.driverClassName}")
+    private String driverClass;
+    @Value("${dataSource.username}")
+    private String username;
+    @Value("${dataSource.password}")
+    private String password;
+    @Value("${dataSource.url}")
+    private String url;
+    
+    @Value("${hibernate.dialect}")
+    private String dialect;
+    @Value("${hibernate.show_sql}")
+    private String showSql;
+    @Value("${cache.provider_class}")
+    private String cacheProviderClass;
+    @Value("${hibernate.format_sql}")
+    private String formatSql;
+    @Value("${hibernate.generate_statistics}")
+    private String generateStatistics;
+    
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+       return new PropertySourcesPlaceholderConfigurer();
+    }
+
+	@Bean
+	@Primary
+	public DataSource dataSource() {
+
+		HikariDataSource ds = new HikariDataSource();
+		ds.setDriverClassName(driverClass);
+		ds.setJdbcUrl(url);
+		ds.setUsername(username);
+		ds.setPassword(password);
+
+		ds.addDataSourceProperty("cachePrepStmts", "true");
+		ds.addDataSourceProperty("prepStmtCacheSize", "250");
+		ds.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+		ds.setConnectionTimeout(20000);
+		ds.setIdleTimeout(600000);
+		ds.setMaxLifetime(900000);
+		ds.setMinimumIdle(1);
+		ds.setMaximumPoolSize(5);
+		ds.setPoolName("goploy-connection-pool");
+
+		return ds;
+	}
+	
+	@Bean
+    public Properties hibernateProperties(){
+
+        Properties props = new Properties();
+        props.setProperty("hibernate.dialect", dialect);
+        props.setProperty("hibernate.show_sql", showSql);
+        props.setProperty("cache.provider_class", cacheProviderClass);
+        props.setProperty("hibernate.format_sql", formatSql);
+        props.setProperty("hibernate.generate_statistics", generateStatistics);
+        props.setProperty("hibernate.bytecode.use_reflection_optimizer", "false");
+
+        return props;
+    }
+	
+	@Bean
+	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+		LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
+		bean.setPersistenceUnitName("postgrePU");
+		bean.setPersistenceProvider(new HibernatePersistenceProvider());
+		bean.setDataSource(dataSource());
+		bean.setJpaProperties(hibernateProperties());
+		bean.setPackagesToScan("br.com.digitoglobal.goploy.model");
+		return bean;
+	}
+	
+	@Bean
+	public PlatformTransactionManager transactionManager() {
+		return new JpaTransactionManager(entityManagerFactory().getObject());
+	}
+}

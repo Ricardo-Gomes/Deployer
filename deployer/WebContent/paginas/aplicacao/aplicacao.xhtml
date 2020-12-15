@@ -1,0 +1,130 @@
+<ui:composition template="/template/layout-padrao.xhtml"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+	<ui:define name="conteudo">
+
+		<div class="box box-default">
+
+			<div class="box-header with-border">
+				<h3 class="box-title">
+					<i class="fa fa-folder" aria-hidden="true"></i> 
+					Aplicações
+				</h3>
+			</div>
+			
+			<div class="box-body">
+				<h:form id="frm">
+					<div class="row">
+						<div class="col-md-3">
+							<div class="form-group">
+								<label>Usuário</label>
+								<h:selectOneMenu id="usuarioCadastro" 
+												 styleClass="form-control"
+												 value="#{listagemAplicaçõesBean.entidade.usuarioCadastro}">
+
+									<f:selectItem itemLabel="--Selecione--" 
+												  itemValue="#{null}" />
+
+									<f:selectItems value="#{listagemAplicaçõesBean.usuarios}"
+												   var="usuarioCadastro" 
+												   itemLabel="#{usuarioCadastro.nome}"
+												   itemValue="#{usuarioCadastro}" />
+								</h:selectOneMenu>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-12">
+							<p:commandButton value="Pesquisar" 
+											 icon="fa fa-search"
+											 styleClass="btn btn-default"
+											 actionListener="#{listagemAplicaçõesBean.consultar}"
+											 update=":frm :frm-resultado" />
+						</div>
+					</div>
+				</h:form>
+			
+			
+			<h:form id="frm-resultado">
+			<div class="row">
+				<div class="col-md-12">
+						<p:dataTable id="aplicacaoTable"
+									 var="aplicacao"
+									 value="#{listagemAplicaçõesBean.resultado}" 
+									 paginator="true"
+									 paginatorPosition="bottom" 
+									 rows="10" 
+									 emptyMessage="nenhum registro">
+									 
+								<p:column headerText="Servidor">
+									<h:outputText value="#{aplicacao.servidor.nome}" />
+								</p:column>
+								
+								<p:column headerText="Caminho do Contexto">
+									<h:outputText value="#{aplicacao.caminhoContexto}" />
+								</p:column>
+								
+								<p:column headerText="Status">
+									<h:outputText value="#{aplicacao.informacoes.status}"/>
+								</p:column>
+								
+								<p:column >
+									<p:commandButton value="Start" 
+													 disabled="#{aplicacao.informacoes.running}"
+													 ajax="false"
+													 actionListener="#{listagemAplicaçõesBean.btnStart(aplicacao)}"
+													 style="color:Green;"
+													 update=":mensagem"
+													 onclick="PF('carregando').show()"
+										             oncomplete="PF('carregando').hide()"/>
+																			
+									<p:commandButton value="Stop" 
+													 disabled="#{aplicacao.informacoes.stopped}"
+													 ajax="false"
+													 actionListener="#{listagemAplicaçõesBean.btnStop(aplicacao)}"
+													 style="margin:0 5px; color:goldenrod;"
+													 update=":mensagem"
+													 onclick="PF('carregando').show()"
+										             oncomplete="PF('carregando').hide()" />
+								
+									<p:commandButton value="Restart" 
+													 disabled="#{aplicacao.informacoes.stopped}"
+													 ajax="false"
+													 actionListener="#{listagemAplicaçõesBean.btnRestart(aplicacao)}"
+													 style="color:Green;"
+													 update=":mensagem"
+													 onclick="PF('carregando').show()"
+										             oncomplete="PF('carregando').hide()" />
+								
+									<p:commandButton value="Undeploy" 
+													 ajax="false"
+													 actionListener="#{listagemAplicaçõesBean.btnUndeploy(aplicacao)}"
+													 style="margin:0 5px; color:red;"
+													 process="@this"
+													 update="aplicacaoTable :mensagem"
+												     onclick="PF('carregando').show()"
+										             oncomplete="PF('carregando').hide()"/>
+								</p:column>
+						</p:dataTable>
+				</div>
+			</div>
+			
+			<p:dialog widgetVar="carregando" 
+				  	  modal="true" 
+				  	  draggable="false" 
+				  	  closable="false" 
+				  	  resizable="false" 
+				  	  showHeader="false">
+				<p:graphicImage value="/resources/images/loadingBall.gif" width="150" height="150"/>
+			</p:dialog>
+			
+			</h:form>
+		</div>
+	</div>
+	</ui:define>
+</ui:composition>
